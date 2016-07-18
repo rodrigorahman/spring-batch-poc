@@ -1,0 +1,104 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:batch="http://www.springframework.org/schema/batch"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/batch
+		http://www.springframework.org/schema/batch/spring-batch-2.2.xsd
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+	"
+       default-lazy-init="false">
+
+
+    <import resource="../config/context.xml"/>
+    <import resource="../config/database.xml"/>
+
+    <bean id="pessoa" class="br.com.rodrigo.calcularIdade.model.Pessoa" scope="prototype"/>
+    <bean id="pessoaIdade" class="br.com.rodrigo.calcularIdade.model.PessoaIdade" factory-bean="getPessoasParaCalculo" scope="step" />
+    <bean id="converterPessoaItemProcessor" scope="step" class="br.com.rodrigo.calcularIdade.ConverterPessoaProcessor"/>
+
+    <bean id="buscarPessaFactory" scope="step" class="br.com.rodrigo.calcularIdade.BuscarPessoasFactoryData" >
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+    <bean id="enviaParaCalculoItemWriter" scope="step" class="br.com.rodrigo.calcularIdade.EnviaParaCalculoDataWriter">
+        <property name="executionContext" value="#{stepExecution.jobExecution.executionContext}"></property>
+    </bean>
+
+    <bean id="buscarPessoasItemReader" scope="step" class="br.com.rodrigo.calcularIdade.PessoasItemReader">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+    <bean id="recuperarPessoasParaCalculoItemReader" scope="step" class="org.springframework.batch.item.support.IteratorItemReader">
+        <constructor-arg>
+            <ref bean="getPessoasParaCalculo" />
+        </constructor-arg>
+    </bean>
+
+    <bean id="getPessoasParaCalculo" scope="step" class="br.com.rodrigo.calcularIdade.GetDataInExecutorProcess">
+        <property name="executionContext" value="#{stepExecution.jobExecution.executionContext}"></property>
+        <property name="key" value="pessoas" ></property>
+    </bean>
+
+
+
+
+    <!--<bean id="getNomes" scope="step" class="br.com.rodrigo.NamesFactoryData">-->
+    <!--<property name="executionContext" value="#{stepExecution.jobExecution.executionContext}"></property>-->
+    <!--</bean>-->
+
+    <bean id="calculaIdadeItemProcess" scope="step" class="br.com.rodrigo.calcularIdade.CalculaIdadeItemProcess" />
+
+    <bean id="imprimirIdadeItemWriter" scope="step" class="br.com.rodrigo.calcularIdade.ImprimirIdadeItemWriter" />
+
+    <batch:job id="CalcularIdadePessoas">
+        <batch:step id="step1_buscar_pessoas" next="step2_calcular_idades" >
+            <batch:tasklet>
+                <batch:chunk reader="buscarPessoasItemReader" writer="enviaParaCalculoItemWriter"
+                             processor="converterPessoaItemProcessor" commit-interval="100">
+                </batch:chunk>
+            </batch:tasklet>
+        </batch:step>
+        <batch:step id="step2_calcular_idades">
+            <batch:tasklet task-executor="taskExecutor">
+                <batch:chunk reader="recuperarPessoasParaCalculoItemReader" writer="imprimirIdadeItemWriter"
+                             processor="calculaIdadeItemProcess" commit-interval="100">
+                </batch:chunk>
+            </batch:tasklet>
+        </batch:step>
+
+    </batch:job>
+
+    <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+        <property name="corePoolSize" value="4"/>
+        <property name="maxPoolSize" value="200"/>
+        <property name="queueCapacity" value="25"/>
+    </bean>
+
+    <!--<bean id="customItemReader1" scope="step" class="br.com.rodrigo.CustomReader"></bean>-->
+
+    <!--<bean id="customItemReader" scope="step" class="org.springframework.batch.item.support.IteratorItemReader">-->
+        <!--<constructor-arg>-->
+            <!--<ref bean="nomesInicial"></ref>-->
+        <!--</constructor-arg>-->
+    <!--</bean>-->
+    <!--<bean id="customItemWriter" scope="step" class="br.com.rodrigo.CustomItemWriter">-->
+        <!--<property name="executionContext" value="#{stepExecution.jobExecution.executionContext}"></property>-->
+    <!--</bean>-->
+
+    <!--<bean id="customStep2Reader" name="customStep2Reader2" scope="step" class="org.springframework.batch.item.support.IteratorItemReader">-->
+        <!--<constructor-arg>-->
+            <!--<ref bean="getNomes"></ref>-->
+        <!--</constructor-arg>-->
+
+    <!--</bean>-->
+
+    <!--<bean id="customStep2Writer" scope="step" class="br.com.rodrigo.CustomStep2Write"></bean>-->
+
+    <!--<bean id="getNomes" scope="step" class="br.com.rodrigo.NamesFactoryData">-->
+        <!--<property name="executionContext" value="#{stepExecution.jobExecution.executionContext}"></property>-->
+    <!--</bean>-->
+
+    <!--<bean id="nomesInicial" scope="step" class="br.com.rodrigo.NamesInicialFactoryData"></bean>-->
+
+</beans>
