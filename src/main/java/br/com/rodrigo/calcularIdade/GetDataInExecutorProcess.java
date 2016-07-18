@@ -1,10 +1,8 @@
 package br.com.rodrigo.calcularIdade;
 
-import br.com.rodrigo.calcularIdade.model.PessoaIdade;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.FactoryBean;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
