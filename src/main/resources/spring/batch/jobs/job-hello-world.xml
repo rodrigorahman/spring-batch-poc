@@ -41,12 +41,6 @@
     </bean>
 
 
-
-
-    <!--<bean id="getNomes" scope="step" class="br.com.rodrigo.NamesFactoryData">-->
-    <!--<property name="executionContext" value="#{stepExecution.jobExecution.executionContext}"></property>-->
-    <!--</bean>-->
-
     <bean id="calculaIdadeItemProcess" scope="step" class="br.com.rodrigo.calcularIdade.CalculaIdadeItemProcess" />
 
     <bean id="imprimirIdadeItemWriter" scope="step" class="br.com.rodrigo.calcularIdade.ImprimirIdadeItemWriter" />
@@ -74,31 +68,5 @@
         <property name="maxPoolSize" value="200"/>
         <property name="queueCapacity" value="25"/>
     </bean>
-
-    <!--<bean id="customItemReader1" scope="step" class="br.com.rodrigo.CustomReader"></bean>-->
-
-    <!--<bean id="customItemReader" scope="step" class="org.springframework.batch.item.support.IteratorItemReader">-->
-        <!--<constructor-arg>-->
-            <!--<ref bean="nomesInicial"></ref>-->
-        <!--</constructor-arg>-->
-    <!--</bean>-->
-    <!--<bean id="customItemWriter" scope="step" class="br.com.rodrigo.CustomItemWriter">-->
-        <!--<property name="executionContext" value="#{stepExecution.jobExecution.executionContext}"></property>-->
-    <!--</bean>-->
-
-    <!--<bean id="customStep2Reader" name="customStep2Reader2" scope="step" class="org.springframework.batch.item.support.IteratorItemReader">-->
-        <!--<constructor-arg>-->
-            <!--<ref bean="getNomes"></ref>-->
-        <!--</constructor-arg>-->
-
-    <!--</bean>-->
-
-    <!--<bean id="customStep2Writer" scope="step" class="br.com.rodrigo.CustomStep2Write"></bean>-->
-
-    <!--<bean id="getNomes" scope="step" class="br.com.rodrigo.NamesFactoryData">-->
-        <!--<property name="executionContext" value="#{stepExecution.jobExecution.executionContext}"></property>-->
-    <!--</bean>-->
-
-    <!--<bean id="nomesInicial" scope="step" class="br.com.rodrigo.NamesInicialFactoryData"></bean>-->
 
 </beans>
